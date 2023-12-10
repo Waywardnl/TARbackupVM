@@ -4,32 +4,34 @@ NU=$(date +"%m-%d-%y_%H-%M")
 
 ## Snapshots maken
 #
-VBoxManage snapshot Wayward_Restricted take TARBackup$NU
+VBoxManage snapshot Wayward_OPNSense take TARBackup$NU
 
 sleep 60
 
 cd /BSD07zdata/VBox/Backup
 rm -R Wayward_$USER.bak
 
-cd /BSD07zdata/VBox/Wayward_Restricted
+cd /BSD07zdata/VBox/Wayward_OPNSense
 
 ## Show the name of the Snapshot
 #
-VBoxManage snapshot Wayward_Restricted list
+VBoxManage snapshot Wayward_OPNSense list
 
-cd /usb-WD1/
+cd /usb-WD2/
 rm Wayward_$USER.tar.gz
-cd /BSD07zdata/VBox/Wayward_Restricted
+cd /BSD07zdata/VBox/Wayward_OPNSense
 
-tar --exclude="Wayward_Restricted/Snapshots/" --verbose -czf - * | openssl enc -e -aes-256-cbc -pbkdf2 -iter 1688000 -ou
+tar --exclude="Wayward_OPNSense/Snapshots/" --verbose -czf - * | openssl enc -e -aes-256-cbc -pbkdf2 -iter 200000 -ou
 t /usb-WD1/Wayward_$USER.tar.gz -pass file:/home/$USER/passwd.dat > /BSD07zdata/VBox/Share/logs/Tar_$USER_Backup.log
 
 cd /BSD07zdata/VBox/Backup
-rm -R Wayward_Restricted.bak
+rm -R Wayward_OPNSense.bak
 
-VBoxManage snapshot Wayward_Restricted delete TARBackup$NU
+## Delete Snapshot
+#
+VBoxManage snapshot Wayward_OPNSense delete TARBackup$NU
 
 #################################################
 ## Restore a virtual machine CLI
 ##
-## openssl enc -d -aes-256-cbc -pbkdf2 -iter 168000 -in Wayward_Restricted.tar.gz  | tar xz --verbose
+## openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in Wayward_OPNSense.tar.gz  | tar xz --verbose
