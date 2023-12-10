@@ -1,0 +1,45 @@
+## Get Date and time into string $NU
+#
+NU=$(date +"%m-%d-%y_%H-%M")
+
+## Snapshots maken
+#
+VBoxManage snapshot Wayward_BackupTest take TARBackup$NU
+
+#VBoxManage controlvm Wayward_BackupTest savestate
+sleep 60
+
+cd /BSD07zdata/VBox/Backup
+rm -R Wayward_$USER.bak
+
+#mkdir /BSD07zdata/VBox/Backup/Wayward_BackupTest.bak
+cd /BSD07zdata/VBox/Wayward_BackupTest
+
+## Show the name of the Snapshot
+#
+VBoxManage snapshot Wayward_BackupTest list
+
+#####################################################################
+## cp -rpnv * /BSD07zdata/VBox/Backup/Wayward_BackupTest.bak
+## rsync -avzh --bwlimit=40000 --log-file=/BSD07zdata/VBox/Share/logs/RSync_InetConsole_Backup.log /BSD07zdata/VBox/Wayward_BackupTest /BSD07zdata/VBox/Backup/Wayward_BackupTest.bak
+
+## VBoxManage startvm Wayward_BackupTest --type headless
+
+cd /usb-WD1/
+rm Wayward_$USER.tar.gz
+cd /BSD07zdata/VBox/Wayward_BackupTest
+
+#tar -czf - * --exclude="*/*" | openssl enc -e -aes-256-cbc -pbkdf2 -iter 1688000 -out /usb-WD1/Wayward_$USER.tar.gz -pass file:/home/$USER/passwd.dat > /BSD07zdata/VBox/Share/logs/Tar_$USER_Backup.log
+
+tar --exclude="Wayward_BackupTest/Snapshots/" --verbose -czf - * | openssl enc -e -aes-256-cbc -pbkdf2 -iter 1688000 -out /usb-WD1/Wayward_$USER.tar.gz -pass file:/home/$USER/passwd.dat > /BSD07zdata/VBox/Share/logs/Tar_$USER_Backup.log
+
+cd /BSD07zdata/VBox/Backup
+rm -R Wayward_BackupTest.bak
+
+VBoxManage snapshot Wayward_BackupTest delete TARBackup$NU
+
+#################################################
+## Restore a virtual machine CLI
+##
+## openssl enc -d -aes-256-cbc -pbkdf2 -iter 1688000 -in Wayward_BackupTest.tar.gz  | tar xz --verbose
+
