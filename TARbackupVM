@@ -4,33 +4,31 @@ NU=$(date +"%m-%d-%y_%H-%M")
 
 ## Snapshots maken
 #
-VBoxManage snapshot Wayward_OPNSense take TARBackup$NU
+VBoxManage snapshot Wayward_DirectAdmin01 take TARBackup$NU
 
 sleep 60
 
 cd /BSD07zdata/VBox/Backup
 rm -R Wayward_$USER.bak
 
-cd /BSD07zdata/VBox/Wayward_OPNSense
+cd /BSD07zdata/VBox/Wayward_DirectAdmin01
 
 ## Show the name of the Snapshot
 #
-VBoxManage snapshot Wayward_OPNSense list
+VBoxManage snapshot Wayward_DirectAdmin01 list
 
-cd /usb-WD2/
+cd /usb-seagate/
 rm Wayward_$USER.tar.gz
-cd /BSD07zdata/VBox/Wayward_OPNSense
+cd /BSD07zdata/VBox/Wayward_DirectAdmin01
 
-tar --exclude="Wayward_OPNSense/Snapshots/" --verbose -czf - * | openssl enc -e -aes-256-cbc -pbkdf2 -iter 200000 -out /usb-WD1/Wayward_$USER.tar.gz -pass file:/home/$USER/passwd.dat > /BSD07zdata/VBox/Share/logs/Tar_$USER_Backup.log
+tar --exclude="Wayward_DirectAdmin01/Snapshots/" --verbose -czf - * | openssl enc -e -aes-256-cbc -pbkdf2 -iter 31277766 -out /usb-seagate/Wayward_$USER.tar.gz -pass file:/home/$USER/passwd.dat > /BSD07zdata/VBox/Share/logs/Tar_$USER_Backup.log
 
 cd /BSD07zdata/VBox/Backup
-rm -R Wayward_OPNSense.bak
+rm -R Wayward_DirectAdmin01.bak
 
-## Delete Snapshot
-#
-VBoxManage snapshot Wayward_OPNSense delete TARBackup$NU
+VBoxManage snapshot Wayward_DirectAdmin01 delete TARBackup$NU
 
 #################################################
 ## Restore a virtual machine CLI
 ##
-## openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in Wayward_OPNSense.tar.gz  | tar xz --verbose
+## openssl enc -d -aes-256-cbc -pbkdf2 -iter 31277766 -in Wayward_DirectAdmin01.tar.gz  | tar xz --verbose
