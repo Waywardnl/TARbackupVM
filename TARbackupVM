@@ -4,31 +4,35 @@ NU=$(date +"%m-%d-%y_%H-%M")
 
 ## Snapshots maken
 #
-VBoxManage snapshot Wayward_DirectAdmin01 take TARBackup$NU
+VBoxManage snapshot Wayward_HyperSpin take TARBackup$NU
 
 sleep 60
 
 cd /BSD07zdata/VBox/Backup
 rm -R Wayward_$USER.bak
 
-cd /BSD07zdata/VBox/Wayward_DirectAdmin01
+cd /BSD07zdata/VBox/Wayward_HyperSpin
 
 ## Show the name of the Snapshot
 #
-VBoxManage snapshot Wayward_DirectAdmin01 list
+VBoxManage snapshot Wayward_HyperSpin list
 
 cd /usb-seagate/
 rm Wayward_$USER.tar.gz
-cd /BSD07zdata/VBox/Wayward_DirectAdmin01
+cd /BSD07zdata/VBox/Wayward_HyperSpin
 
-tar --exclude="Wayward_DirectAdmin01/Snapshots/" --verbose -czf - * | openssl enc -e -aes-256-cbc -pbkdf2 -iter 31277766 -out /usb-seagate/Wayward_$USER.tar.gz -pass file:/home/$USER/passwd.dat > /BSD07zdata/VBox/Share/logs/Tar_$USER_Backup.log
+tar --exclude="Wayward_HyperSpin/Snapshots/" --verbose -czf - * | openssl enc -e -aes-256-cbc -pbkdf2 -iter 41118 -ou
+t /usb-seagate/Wayward_$USER.tar.gz -pass file:/home/$USER/passwd.dat > /BSD07zdata/VBox/Share/logs/Tar_$USER_Backup.log
 
 cd /BSD07zdata/VBox/Backup
-rm -R Wayward_DirectAdmin01.bak
+rm -R Wayward_HyperSpin.bak
 
-VBoxManage snapshot Wayward_DirectAdmin01 delete TARBackup$NU
+VBoxManage snapshot Wayward_HyperSpin delete TARBackup$NU
+
+cd /usb-seagate/
+rm Wayward_HyperSpin.tar.gz
 
 #################################################
 ## Restore a virtual machine CLI
 ##
-## openssl enc -d -aes-256-cbc -pbkdf2 -iter 31277766 -in Wayward_DirectAdmin01.tar.gz  | tar xz --verbose
+## openssl enc -d -aes-256-cbc -pbkdf2 -iter 41118 -in Wayward_HyperSpin.tar.gz  | tar xz --verbose
