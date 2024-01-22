@@ -21,8 +21,7 @@ cd /usb-seagate/
 rm Wayward_$USER.tar.gz
 cd /BSD07zdata/VBox/Wayward_HyperSpin
 
-tar --exclude="Wayward_HyperSpin/Snapshots/" --verbose -czf - * | openssl enc -e -aes-256-cbc -pbkdf2 -iter 41118 -ou
-t /usb-seagate/Wayward_$USER.tar.gz -pass file:/home/$USER/passwd.dat > /BSD07zdata/VBox/Share/logs/Tar_$USER_Backup.log
+tar --exclude="Wayward_HyperSpin/Snapshots/" --verbose -czf - * | openssl enc -e -aes-256-cbc -pbkdf2 -iter 41118 -out /usb-seagate/Wayward_$USER.tar.gz -pass file:/home/$USER/passwd.dat > /BSD07zdata/VBox/Share/logs/Tar_$USER_Backup.log
 
 cd /BSD07zdata/VBox/Backup
 rm -R Wayward_HyperSpin.bak
