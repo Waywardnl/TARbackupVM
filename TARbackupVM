@@ -2,36 +2,66 @@
 #
 NU=$(date +"%m-%d-%y_%H-%M")
 
-## Snapshots maken
+## Delete all the snapshots?
+##
+## https://superuser.com/questions/628544/how-to-delete-all-snaphosts-in-virtualbox
 #
-VBoxManage snapshot Wayward_HyperSpin take TARBackup$NU
+if [ $1 = "deletesnapshots" ] ; then
+  ## Yes Delete all snapshots! This is not a Drill!
+  #
+  DEBUG=false; PROMPT=false
+  echo "Delete all the Snapshots of this machine: Wayward_$USER"
+else
+  ## Just showing what will be deleted without the parameter:
+  ## deletesnapshots
+  ##
+  ## This is just a TEST!
+  #
+  DEBUG=true; PROMPT=true
+  echo "Keep all the snapshots, the following lines are for debugging of snapshots for: Wayward_$USER"
+fi
+
+vbox_delete_all_snapshots() {
+  vboxmanage snapshot "$1" list |
+    tac |perl -lane 'print $1 if /UUID: ([a-z0-9-]+)/' |
+    xargs ${PROMPT:+-p} -n1 ${DEBUG:+echo} vboxmanage snapshot "$1" delete
+  if $DEBUG && [ $? = 0 ] ; then
+    echo "The above commands were NOT run. Unset DEBUG (and PROMPT if you feel lucky) to do so."
+  fi
+}
+vmname=Wayward_$USER
+vbox_delete_all_snapshots "$vmname"
+
+#########################################
+## Snapshot maken / Make a new snapshot
+#
+echo "Creating a new snapshot for machine: Wayward_$USER"
+
+VBoxManage snapshot Wayward_$USER take TARBackup$NU
 
 sleep 60
 
 cd /BSD07zdata/VBox/Backup
 rm -R Wayward_$USER.bak
 
-cd /BSD07zdata/VBox/Wayward_HyperSpin
+cd /BSD07zdata/VBox/Wayward_$USER
 
 ## Show the name of the Snapshot
 #
-VBoxManage snapshot Wayward_HyperSpin list
+VBoxManage snapshot Wayward_$USER list
 
-cd /usb-seagate/
+cd /usb-WD2/
 rm Wayward_$USER.tar.gz
-cd /BSD07zdata/VBox/Wayward_HyperSpin
+cd /BSD07zdata/VBox/Wayward_$USER
 
-tar --exclude="Wayward_HyperSpin/Snapshots/" --verbose -czf - * | openssl enc -e -aes-256-cbc -pbkdf2 -iter 41118 -out /usb-seagate/Wayward_$USER.tar.gz -pass file:/home/$USER/passwd.dat > /BSD07zdata/VBox/Share/logs/Tar_$USER_Backup.log
+tar --exclude="Wayward_$USER/Snapshots/" --verbose -czf - * | openssl enc -e -aes-256-cbc -pbkdf2 -iter 1138022 -out /usb-WD3/Wayward_$USER.tar.gz -pass file:/home/$USER/passwd.dat > /BSD07zdata/VBox/Share/logs/Tar_$USER_Backup.log
 
 cd /BSD07zdata/VBox/Backup
-rm -R Wayward_HyperSpin.bak
+rm -R Wayward_$USER.bak
 
-VBoxManage snapshot Wayward_HyperSpin delete TARBackup$NU
-
-cd /usb-seagate/
-rm Wayward_HyperSpin.tar.gz
+VBoxManage snapshot Wayward_$USER delete TARBackup$NU
 
 #################################################
 ## Restore a virtual machine CLI
 ##
-## openssl enc -d -aes-256-cbc -pbkdf2 -iter 41118 -in Wayward_HyperSpin.tar.gz  | tar xz --verbose
+## openssl enc -d -aes-256-cbc -pbkdf2 -iter 1138022 -in Wayward_$USER.tar.gz  | tar xz --verbose
