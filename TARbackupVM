@@ -9,28 +9,30 @@ NU=$(date +"%m-%d-%y_%H-%M")
 if [ $1 = "deletesnapshots" ] ; then
   ## Yes Delete all snapshots! This is not a Drill!
   #
-  DEBUG=false; PROMPT=false
   echo "Delete all the Snapshots of this machine: Wayward_$USER"
+  string=$(VBoxManage snapshot "Wayward_$USER" list)
+
+  # Set positional parameters to the words in the string
+  set -- $string
+
+  # Iterate through positional parameters using a loop
+  remember="Leeg"
+  for word in $@; do
+    #echo "checking: $word"
+    if [ $remember = "Name:" ] ; then
+      echo "Remove snapshot: $word"
+      VBoxManage snapshot Wayward_$USER delete $word
+    fi
+    remember=$word
+  done
 else
   ## Just showing what will be deleted without the parameter:
   ## deletesnapshots
   ##
   ## This is just a TEST!
   #
-  DEBUG=true; PROMPT=true
   echo "Keep all the snapshots, the following lines are for debugging of snapshots for: Wayward_$USER"
 fi
-
-vbox_delete_all_snapshots() {
-  vboxmanage snapshot "$1" list |
-    tac |perl -lane 'print $1 if /UUID: ([a-z0-9-]+)/' |
-    xargs ${PROMPT:+-p} -n1 ${DEBUG:+echo} vboxmanage snapshot "$1" delete
-  if $DEBUG && [ $? = 0 ] ; then
-    echo "The above commands were NOT run. Unset DEBUG (and PROMPT if you feel lucky) to do so."
-  fi
-}
-vmname=Wayward_$USER
-vbox_delete_all_snapshots "$vmname"
 
 #########################################
 ## Snapshot maken / Make a new snapshot
